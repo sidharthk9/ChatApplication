@@ -28,16 +28,16 @@ fn main() {
 				let mut buffer = vec![0; MESSAGE_SIZE];
 				match socket.read_exact(&mut buffer) {
 					Ok(_) => {
-						let iterable_content = buffer.into_iter().take_while(|x| x != 0)
+						let iterable_content = buffer.into_iter().take_while(|&x| x != 0)
 							.collect::<Vec<_>>();
 						let message = String::from_utf8(iterable_content)
 							.expect("Error: invalid Message");
 
-						println!("{0}: {1}", address, message);
-						transmitter.send(message).expect("Error: Message did not reach receiver");
+						println!("{0}: {1:?}", address, message);
+						single_transmitter.send(message).expect("Error: Message did not reach receiver");
 					},
 
-					Err(ref error) if error.kind() = ErrorKind::WouldBlock => (),
+					Err(ref error) if error.kind() == ErrorKind::WouldBlock => (),
 
 					Err(_) => {
 						println!("Closing connection with {0}", address);
